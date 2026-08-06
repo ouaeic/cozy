@@ -1,0 +1,113 @@
+appId: app.getcozy.desktop
+productName: Cozy
+copyright: Cozy contributors
+
+directories:
+  buildResources: build
+  output: release
+
+files:
+  - out/**/*
+  - '!**/*.map'
+
+# The tray icon is loaded from process.resourcesPath at runtime (see main/tray.ts).
+extraResources:
+  - from: resources/
+    to: .
+    filter: ['**/*']
+
+# Unsigned builds by design — see README. Adding certificates later needs no
+# code changes, only these keys plus CI secrets.
+mac:
+  category: public.app-category.social-networking
+  target:
+    - target: dmg
+      arch: [universal]
+  darkModeSupport: true
+  # Required for the TCC prompts to read sensibly instead of appearing blank.
+  extendInfo:
+    NSCameraUsageDescription: Cozy needs your camera so the person you're watching with can see you.
+    NSMicrophoneUsageDescription: Cozy needs your microphone so the person you're watching with can hear you.
+    NSScreenCaptureUsageDescription: Cozy needs screen recording access to share what you're watching.
+    # Required from macOS 14.2 onward. Without this key Chromium's CoreAudio Tap
+    # hands back a live audio track full of digital zeros — no error, just
+    # silence. It is the single easiest way to ship a broken movie night.
+    NSAudioCaptureUsageDescription: Cozy needs to capture your computer's audio so the film's sound reaches the person you're watching with.
+    LSMinimumSystemVersion: '12.3'
+  # Loopback audio capture needs the unsigned/ad-hoc build to still be able to
+  # talk to ScreenCaptureKit; hardened runtime stays off until we notarize.
+  hardenedRuntime: false
+  gatekeeperAssess: false
+
+dmg:
+  artifactName: ${productName}-${version}-${arch}.${ext}
+  contents:
+    - x: 140
+      y: 190
+      type: file
+    - x: 400
+      y: 190
+      type: link
+      path: /Applications
+
+win:
+  target:
+    - target: nsis
+      arch: [x64, arm64]
+  artifactName: ${productName}-${version}-${arch}.${ext}
+
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  deleteAppDataOnUninstall: false
+
+linux:
+  # Becomes `Categories=` in the .desktop file. The top-level key wins over
+  # anything set in `desktop:` below, so it has to carry the full list.
+  category: Network;AudioVideo;Chat
+  synopsis: Watch things together, from far apart.
+  target:
+    - target: AppImage
+      arch: [x64, arm64]
+    - target: deb
+      arch: [x64, arm64]
+  artifactName: ${productName}-${version}-${arch}.${ext}
+  # Required for a .deb to build at all — package.json's `author` is a bare
+  # string with no email, and fpm refuses to make a package without a
+  # maintainer. Omitting this failed the whole Linux job, silently, because
+  # fail-fast is off and the mac/windows jobs still published.
+  # A .deb will not build without a maintainer. This address deliberately does
+  # not accept mail — the domain is ours, so nobody else can claim it, and
+  # security reports go through GitHub's private reporting (see SECURITY.md)
+  # rather than to an inbox nobody is watching.
+  maintainer: Cozy contributors <noreply@getcozy.app>
+  # electron-builder 25 takes a FLAT map here. The nested `desktopEntry: {...}`
+  # form is 26-only and is rejected by the schema; `desktop: { entry: {...} }`
+  # serialises as `entry=[object Object]`.
+  #
+  # Exec and MimeType are omitted on purpose: electron-builder generates
+  # `Exec=/opt/Cozy/cozy %U` itself, and the top-level `protocols:` key below
+  # is what writes MimeType — setting it here would only overwrite it.
+  desktop:
+    StartupWMClass: Cozy
+
+deb:
+  # Gives Chromium's sandbox a way to work on Ubuntu 24.04+; see the script.
+  afterInstall: build/linux-after-install.sh
+  afterRemove: build/linux-after-remove.sh
+  # electron-builder still recommends libappindicator3-1, which was REMOVED from
+  # Debian 12 and Ubuntu 24.04. Electron 43 doesn't need it either way — it
+  # speaks StatusNotifierItem over D-Bus directly — but naming a package that no
+  # longer exists is a bad look on a fresh install, so point at the maintained
+  # fork. An empty list here does not override; app-builder falls back.
+  recommends: [libayatana-appindicator3-1]
+
+protocols:
+  - name: Cozy
+    schemes: [cozy]
+
+publish:
+  provider: github
+  owner: getcozy
+  repo: cozy

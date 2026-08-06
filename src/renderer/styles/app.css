@@ -1,0 +1,1155 @@
+/* Cozy — one stylesheet, no framework.
+   Dark only: it's a room with the lights off, on purpose. */
+
+:root {
+  --ink: #141312;
+  --surface: #1e1c1a;
+  --surface-2: #272422;
+  --surface-3: #322e2b;
+  --line: rgba(242, 237, 231, 0.09);
+  --line-strong: rgba(242, 237, 231, 0.16);
+
+  --text: #f2ede7;
+  --muted: #a79e95;
+  --faint: #6e665f;
+
+  --ember: #d9654e;
+  --ember-soft: rgba(217, 101, 78, 0.16);
+  --ember-line: rgba(217, 101, 78, 0.45);
+  --good: #6fbf8b;
+  --warn: #e5b769;
+
+  --r-sm: 9px;
+  --r: 14px;
+  --r-lg: 20px;
+  --pill: 999px;
+
+  --t: 180ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  --shadow: 0 18px 44px rgba(0, 0, 0, 0.55), 0 2px 8px rgba(0, 0, 0, 0.4);
+
+  --titlebar: 44px;
+
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root,
+/* The Faces window mounts into #faces, not #root. Without it here the flex
+   column below has no height to divide up and every tile collapses to zero. */
+#faces {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--ink);
+  color: var(--text);
+  font: 400 14px/1.5 -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue',
+    system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+  user-select: none;
+  cursor: default;
+}
+
+button,
+input {
+  font: inherit;
+  color: inherit;
+}
+
+::selection {
+  background: var(--ember-soft);
+}
+
+:focus-visible {
+  outline: 2px solid var(--ember);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ------------------------------------------------------------ scaffolding */
+
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.titlebar {
+  height: var(--titlebar);
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 14px 0 var(--titlebar-inset, 14px);
+  -webkit-app-region: drag;
+  color: var(--faint);
+  font-size: 12px;
+  letter-spacing: 0.02em;
+}
+
+.titlebar--mac {
+  --titlebar-inset: 86px;
+}
+
+.titlebar .spacer {
+  flex: 1;
+}
+
+.titlebar b {
+  color: var(--muted);
+  font-weight: 550;
+}
+
+.titlebar .no-drag {
+  -webkit-app-region: no-drag;
+}
+
+/* --------------------------------------------------------------- controls */
+
+.btn {
+  -webkit-app-region: no-drag;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 38px;
+  padding: 0 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--pill);
+  background: var(--surface-2);
+  color: var(--text);
+  cursor: pointer;
+  transition:
+    background var(--t),
+    border-color var(--t),
+    transform var(--t),
+    opacity var(--t);
+  white-space: nowrap;
+}
+
+.btn:hover:not(:disabled) {
+  background: var(--surface-3);
+  border-color: var(--line-strong);
+}
+
+.btn:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.btn:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.btn--primary {
+  background: var(--ember);
+  border-color: transparent;
+  color: #1a0f0c;
+  font-weight: 600;
+}
+
+.btn--primary:hover:not(:disabled) {
+  background: #e4735d;
+  border-color: transparent;
+}
+
+.btn--quiet {
+  background: transparent;
+  border-color: transparent;
+  color: var(--muted);
+}
+
+.btn--quiet:hover:not(:disabled) {
+  background: var(--surface-2);
+  color: var(--text);
+}
+
+.btn--danger:hover:not(:disabled) {
+  background: rgba(217, 78, 78, 0.18);
+  border-color: rgba(217, 78, 78, 0.4);
+  color: #ff9b8b;
+}
+
+.btn--lg {
+  height: 46px;
+  padding: 0 26px;
+  font-size: 15px;
+}
+
+/* Circular icon button, used in the control bar and on the face tiles. */
+.icon {
+  -webkit-app-region: no-drag;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: var(--pill);
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  transition:
+    background var(--t),
+    color var(--t),
+    transform var(--t);
+}
+
+.icon:hover:not(:disabled) {
+  background: rgba(242, 237, 231, 0.08);
+  color: var(--text);
+}
+
+.icon:active:not(:disabled) {
+  transform: scale(0.94);
+}
+
+.icon:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.icon--off {
+  background: rgba(217, 78, 78, 0.16);
+  color: #ff9b8b;
+}
+
+.icon--off:hover:not(:disabled) {
+  background: rgba(217, 78, 78, 0.24);
+  color: #ffb3a5;
+}
+
+.icon--live {
+  background: var(--ember-soft);
+  color: var(--ember);
+}
+
+.icon--sm {
+  width: 28px;
+  height: 28px;
+}
+
+.field {
+  -webkit-app-region: no-drag;
+  height: 42px;
+  width: 100%;
+  padding: 0 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: var(--surface);
+  color: var(--text);
+  transition: border-color var(--t);
+  user-select: text;
+}
+
+.field:focus {
+  outline: none;
+  border-color: var(--ember-line);
+}
+
+.field::placeholder {
+  color: var(--faint);
+}
+
+/* ------------------------------------------------------------------ hearth */
+
+.hearth {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 26px;
+  padding: 20px 24px 56px;
+}
+
+.preview {
+  position: relative;
+  width: 340px;
+  aspect-ratio: 4 / 3;
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+}
+
+.preview video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scaleX(-1); /* a mirror is what you expect to see */
+  display: block;
+}
+
+.preview__off {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: var(--faint);
+  font-size: 13px;
+  background: var(--surface);
+}
+
+/* Sits just above the preview's controls, so "am I being heard" and the mute
+   button are the same glance. */
+.level {
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  bottom: 60px;
+  height: 3px;
+  border-radius: var(--pill);
+  background: rgba(242, 237, 231, 0.14);
+  overflow: hidden;
+}
+
+.level__fill {
+  height: 100%;
+  width: 100%;
+  border-radius: var(--pill);
+  background: var(--good);
+  transform-origin: left center;
+  transform: scaleX(0);
+  /* Fast attack, gentle release — reads as a voice rather than a strobe. */
+  transition: transform 90ms linear;
+}
+
+.preview__controls {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px;
+  background: linear-gradient(to top, rgba(10, 9, 8, 0.82), transparent);
+}
+
+.hearth__name {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.hearth__name-text {
+  font-size: 16px;
+  letter-spacing: 0.01em;
+}
+
+.hearth__actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  width: 340px;
+}
+
+.hearth__join {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+}
+
+.rule {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  color: var(--faint);
+  font-size: 12px;
+}
+
+.rule::before,
+.rule::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--line);
+}
+
+.reconnect {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  height: 58px;
+  padding: 0 8px 0 14px;
+  border: 1px solid var(--ember-line);
+  border-radius: var(--r);
+  background: linear-gradient(180deg, rgba(217, 101, 78, 0.13), rgba(217, 101, 78, 0.06));
+  cursor: pointer;
+  text-align: left;
+  transition: background var(--t);
+  -webkit-app-region: no-drag;
+}
+
+.reconnect:hover {
+  background: linear-gradient(180deg, rgba(217, 101, 78, 0.2), rgba(217, 101, 78, 0.1));
+}
+
+.reconnect__text {
+  flex: 1;
+  min-width: 0;
+}
+
+.reconnect__text b {
+  display: block;
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.reconnect__text span {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.avatar {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: var(--pill);
+  font-weight: 600;
+  font-size: 14px;
+  color: #1a0f0c;
+}
+
+/* ----------------------------------------------------------------- waiting */
+
+.waiting {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 22px;
+  padding: 24px;
+  text-align: center;
+}
+
+.waiting h1 {
+  margin: 0;
+  font-size: 21px;
+  font-weight: 600;
+}
+
+.waiting p {
+  margin: 0;
+  max-width: 380px;
+  color: var(--muted);
+}
+
+.code {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  background: var(--surface);
+  /* Six characters, read off one screen and typed into another — so a
+     tabular monospace where 0 and O could never be mistaken, generously
+     spaced. */
+  font: 600 30px/1 ui-monospace, SFMono-Regular, Menlo, monospace;
+  letter-spacing: 0.16em;
+  user-select: text;
+}
+
+.pulse {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: var(--pill);
+  background: var(--ember);
+  animation: breathe 2.6s ease-in-out infinite;
+}
+
+@keyframes breathe {
+  0%,
+  100% {
+    opacity: 0.25;
+    transform: scale(0.85);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ------------------------------------------------------------------ stage */
+
+.stage {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  background: #0a0a0a;
+  overflow: hidden;
+}
+
+.stage--hide-cursor {
+  cursor: none;
+}
+
+/* Invisible, and only as tall as the traffic lights it sits behind on macOS.
+   There is nothing to click along the top edge of a film, so taking those few
+   pixels costs nothing and gives the window back its handle. */
+.dragstrip {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 28px;
+  z-index: 4;
+  -webkit-app-region: drag;
+}
+
+.stage video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  background: #0a0a0a;
+}
+
+.stage__empty {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  color: var(--faint);
+  background: radial-gradient(120% 80% at 50% 40%, #171514 0%, #0d0c0b 100%);
+}
+
+.stage__empty h2 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+/* =========================================================================
+   The floating control panel.
+
+   Its own always-on-top window, hidden at the top edge of the screen until the
+   pointer goes looking for it. Transparent window, so the visible thing is the
+   pill inside it — and the window is a little taller than the pill so there is
+   somewhere for the popover to open into.
+   ========================================================================= */
+
+body.bar-window {
+  background: transparent;
+  overflow: hidden;
+}
+
+/* The pill is `display: inline-flex`, and auto margins only centre BLOCK-level
+   boxes — so the `margin: 0 auto` that used to be on it did nothing at all.
+   It looked centred anyway because the window is resized to hug the pill, which
+   hid the bug everywhere except the moments the two disagree: the first frame
+   before the measuring effect runs, and any time the content changes width
+   (a badge appearing, a popover opening). Centre the host, which always fills
+   the window, and it is centred at every width. */
+body.bar-window #bar,
+body.bar-window {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+body.bar-window #bar {
+  width: 100%;
+}
+
+.floatbar {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  /* Flush with the top edge of the screen and hanging down from it, rather than
+     floating below it. Square top corners, rounded bottom — it reads as
+     something that came down from the edge rather than a pill parked near it. */
+  border-radius: 0 0 var(--r-lg) var(--r-lg);
+  /* Order matters: the shorthand has to come FIRST, or it puts the top border
+     straight back. It did, which is why the panel looked detached from the
+     edge it is supposed to be hanging from. */
+  border: 1px solid var(--line);
+  border-top: none;
+  /* Opaque enough to read against a bright film, blurred so it still belongs
+     to whatever is behind it. */
+  background: rgba(22, 20, 19, 0.92);
+  backdrop-filter: blur(20px) saturate(1.2);
+  width: max-content;
+  position: relative;
+}
+
+/* Comes down rather than appearing. The window is shown instantly by the main
+   process; this is what makes that read as a movement. */
+.floatbar {
+  opacity: 0;
+  transform: translateY(-100%);
+  transition:
+    opacity var(--t),
+    transform var(--t);
+}
+
+.floatbar--in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.floatbar .spacer {
+  width: 4px;
+}
+
+.floatbar__group {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+/* A hairline divider between clusters, so eight buttons don't read as a wall. */
+.floatbar__divide {
+  width: 1px;
+  height: 22px;
+  margin: 0 4px;
+  background: var(--line);
+}
+
+/* -------------------------------------------------------------- popovers */
+
+.pop {
+  position: absolute;
+  top: 60px;
+  z-index: 5;
+  width: 268px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  -webkit-app-region: no-drag;
+}
+
+.pop h3 {
+  margin: 0 0 4px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.pop p {
+  margin: 0 0 14px;
+  color: var(--faint);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.pop--bar {
+  top: calc(100% + 8px);
+  right: 0;
+}
+
+.slider {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 4px;
+  border-radius: var(--pill);
+  background: var(--surface-3);
+  outline: none;
+  margin: 6px 0 4px;
+  cursor: pointer;
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: var(--pill);
+  background: var(--ember);
+  cursor: grab;
+  border: 3px solid var(--surface);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+}
+
+.slider-ends {
+  display: flex;
+  justify-content: space-between;
+  color: var(--faint);
+  font-size: 11px;
+}
+
+.toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 0 2px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+}
+
+.toggle__track {
+  flex: 0 0 auto;
+  position: relative;
+  width: 36px;
+  height: 20px;
+  border-radius: var(--pill);
+  background: var(--surface-3);
+  transition: background var(--t);
+}
+
+.toggle__track::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 14px;
+  height: 14px;
+  border-radius: var(--pill);
+  background: var(--muted);
+  transition:
+    transform var(--t),
+    background var(--t);
+}
+
+.toggle--on .toggle__track {
+  background: var(--ember-soft);
+}
+
+.toggle--on .toggle__track::after {
+  transform: translateX(16px);
+  background: var(--ember);
+}
+
+/* ----------------------------------------------------------------- sheets */
+
+.scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  display: grid;
+  place-items: center;
+  padding: 40px 24px;
+  background: rgba(8, 7, 7, 0.72);
+  backdrop-filter: blur(6px);
+  -webkit-app-region: no-drag;
+}
+
+.sheet {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  max-width: 720px;
+  max-height: 100%;
+  padding: 22px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.sheet--narrow {
+  max-width: 440px;
+}
+
+.sheet h2 {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.sheet p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.sheet__head {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.sheet__head .spacer {
+  flex: 1;
+}
+
+.sheet__foot {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.sheet__scroll {
+  overflow-y: auto;
+  margin: 0 -6px;
+  padding: 0 6px;
+}
+
+.tabs {
+  display: flex;
+  gap: 4px;
+  padding: 3px;
+  border-radius: var(--pill);
+  background: var(--ink);
+  align-self: flex-start;
+}
+
+.tab {
+  height: 30px;
+  padding: 0 14px;
+  border: none;
+  border-radius: var(--pill);
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  transition:
+    background var(--t),
+    color var(--t);
+}
+
+.tab--on {
+  background: var(--surface-3);
+  color: var(--text);
+}
+
+/* -------------------------------------------------------------- picker */
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(196px, 1fr));
+  gap: 12px;
+}
+
+.source {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  background: var(--ink);
+  cursor: pointer;
+  text-align: left;
+  transition:
+    border-color var(--t),
+    background var(--t);
+}
+
+.source:hover {
+  border-color: var(--ember-line);
+  background: var(--surface-2);
+}
+
+.source img.thumb {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  object-fit: contain;
+  border-radius: var(--r-sm);
+  background: #0a0a0a;
+  display: block;
+}
+
+.source__label {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+}
+
+.source__label img {
+  width: 15px;
+  height: 15px;
+  flex: 0 0 auto;
+}
+
+.source__label span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.empty-note {
+  padding: 28px 8px;
+  text-align: center;
+  color: var(--faint);
+}
+
+/* ---------------------------------------------------------------- notice */
+
+.notice {
+  position: absolute;
+  left: 50%;
+  bottom: 26px;
+  z-index: 20;
+  transform: translateX(-50%);
+  max-width: 460px;
+  padding: 11px 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--pill);
+  background: var(--surface-2);
+  box-shadow: var(--shadow);
+  color: var(--text);
+  font-size: 13px;
+  animation: rise var(--t);
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 8px);
+  }
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: var(--pill);
+  background: var(--ember-soft);
+  color: var(--ember);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+}
+
+.badge--warn {
+  border: none;
+  background: rgba(229, 183, 105, 0.16);
+  color: var(--warn);
+  cursor: pointer;
+  -webkit-app-region: no-drag;
+}
+
+.badge--warn:hover {
+  background: rgba(229, 183, 105, 0.26);
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.faint {
+  color: var(--faint);
+  font-size: 12px;
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* =========================================================================
+   The floating Faces window. Transparent, always on top, its own OS window —
+   which is why it survives you switching to VLC or going fullscreen.
+   ========================================================================= */
+
+body.faces-window {
+  background: transparent;
+  overflow: hidden;
+}
+
+/* Columns are set inline — one for a pair, more as people arrive. */
+.faces {
+  display: grid;
+  grid-auto-rows: 1fr;
+  gap: 8px;
+  padding: 12px;
+  height: 100%;
+  -webkit-app-region: drag;
+}
+
+/* No drop shadow, no border. The overlay sits on someone's desktop all
+   evening; it should read as the picture itself and nothing more. */
+.tile {
+  position: relative;
+  min-height: 0;
+  border-radius: var(--r);
+  overflow: hidden;
+  background: #16110f;
+  contain: strict;
+}
+
+/* A warm ring on whoever is talking. An outline rather than a shadow, so it
+   stays inside the tile's own bounds and casts nothing. */
+.tile--speaking {
+  outline: 2px solid var(--ember);
+  outline-offset: -2px;
+}
+
+.tile video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.tile--self video {
+  transform: scaleX(-1);
+}
+
+.tile__off {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(160deg, #2a2320, #17130f);
+}
+
+.tile__initial {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: var(--pill);
+  font-weight: 600;
+  color: #1a0f0c;
+}
+
+.tile__name {
+  position: absolute;
+  left: 8px;
+  bottom: 7px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  max-width: calc(100% - 16px);
+  padding: 3px 8px;
+  border-radius: var(--pill);
+  background: rgba(10, 9, 8, 0.62);
+  backdrop-filter: blur(6px);
+  font-size: 11px;
+  color: var(--text);
+  opacity: 0;
+  transition: opacity var(--t);
+  pointer-events: none;
+}
+
+.tile__name span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.faces:hover .tile__name,
+.tile__name--pinned {
+  opacity: 1;
+}
+
+.tile__muted {
+  color: #ff9b8b;
+  display: inline-flex;
+}
+
+.faces__tools {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  display: flex;
+  gap: 2px;
+  padding: 3px;
+  border-radius: var(--pill);
+  background: rgba(10, 9, 8, 0.72);
+  backdrop-filter: blur(8px);
+  opacity: 0;
+  transition: opacity var(--t);
+  -webkit-app-region: no-drag;
+  z-index: 2;
+}
+
+.faces:hover .faces__tools {
+  opacity: 1;
+}
+
+.faces__tools .icon {
+  color: var(--text);
+}
+
+/* When nobody is connected the window shrinks to a small, quiet marker. */
+.pill {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 100%;
+  border-radius: var(--pill);
+  background: rgba(26, 23, 21, 0.92);
+  color: var(--muted);
+  font-size: 12px;
+  -webkit-app-region: drag;
+}
+
+
+/* ---------------------------------------------------------------- motion */
+
+/* Someone who gets motion sick, or who simply asked their computer to calm
+   down, should not be handed a breathing dot and sliding panels. Everything
+   still changes state — it just arrives rather than travels. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* =========================================================================
+   Wayland fallback. The compositor won't let a window float, be placed, or
+   stay on top, so the overlays are drawn inside the Stage instead. Same
+   components, same styles — only the host changes.
+   ========================================================================= */
+
+.inlay {
+  position: absolute;
+  z-index: 6;
+}
+
+.inlay--faces {
+  top: 12px;
+  right: 12px;
+}
+
+/* No autohide here: without a way to read the cursor's position on Wayland
+   there is nothing to hide from, and a control bar you can't get back would
+   leave someone with no way to unmute. */
+.inlay--bar {
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.inlay .faces {
+  height: 100%;
+  -webkit-app-region: no-drag; /* it isn't its own window; dragging would move the Stage */
+}

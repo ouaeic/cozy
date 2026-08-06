@@ -1,0 +1,71 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-14
+            script: dist:mac
+          - os: windows-latest
+            script: dist:win
+          - os: ubuntu-latest
+            script: dist:linux
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      # Regenerated rather than trusted from the repo, so the mark can never
+      # drift from the script that defines it.
+      - run: node scripts/gen-icons.mjs
+
+      - run: npm run typecheck
+
+      # The only suite that needs no display and no Electron, so it can run on
+      # every platform in a few seconds. It checks the invite alphabet, the
+      # deep-link parsing and the name generator against the real modules.
+      - run: npm run test:codes
+
+      # Unsigned by design — see README. Adding certificates later means adding
+      # secrets here and keys to electron-builder.yml; no application code changes.
+      - run: npm run ${{ matrix.script }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CSC_IDENTITY_AUTO_DISCOVERY: false
+          # Bakes your signalling server into the release, so nobody who
+          # installs it has to open Settings. Set it as a repository VARIABLE
+          # (Settings -> Secrets and variables -> Actions -> Variables), not a
+          # secret — it is a public URL, and secrets are masked in logs which
+          # makes a wrong one impossible to debug.
+          #
+          # Left unset, the build still succeeds and every user is told on the
+          # home screen that no server is configured.
+          COZY_SIGNAL: ${{ vars.COZY_SIGNAL }}
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cozy-${{ matrix.os }}
+          path: |
+            release/*.dmg
+            release/*.exe
+            release/*.AppImage
+            release/*.deb
+          if-no-files-found: error

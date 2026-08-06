@@ -1,0 +1,28 @@
+# Build output
+out/
+release/
+dist/
+*.tsbuildinfo
+
+# Dependencies
+node_modules/
+
+# Editor and OS noise
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+
+# Local configuration and anything that might carry a secret
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.mobileprovision
+.wrangler/
+
+# Test scratch
+test/.tmp/
