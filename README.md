@@ -104,46 +104,38 @@ settings. See [LIMITATIONS.md](docs/LIMITATIONS.md).
 
 ---
 
-## You need one small server. It is free.
+## There is nothing to set up
 
-Two people cannot find each other on the internet without something to introduce them — that is true
-of every peer-to-peer app. Cozy's introducer is about a hundred lines and does the least possible
-work: it passes a few sealed messages between two sockets and never sees your video, your audio, or
-even the room name in the clear (see [PRIVACY.md](docs/PRIVACY.md)).
+No accounts, no sign-up, no server for you to run, and nothing to pay — not a subscription, not a
+trial, not a "free tier" you might exceed. Install it, and it works.
 
-It costs nothing to run. Cloudflare's free tier covers thousands of movie nights a day, because a
-room is a hibernating WebSocket that is only billed when a message actually crosses it.
+Two computers can't find each other on the internet without something to introduce them; that's true
+of every peer-to-peer app. We run that introducer, at `getcozy.app`. It is about a hundred lines and
+does the least possible work: it passes a few sealed messages between two sockets and then gets out
+of the way. Your video and audio go **straight from one computer to the other** and never touch it —
+a whole evening costs about six small messages there. It can't read them either: the room id is a
+hash of a secret it never receives, and every payload is sealed (see [PRIVACY.md](docs/PRIVACY.md)).
 
-```bash
-npx wrangler deploy --config server/wrangler.toml     # prints your URL
-```
+That's also why it stays free. There's no bandwidth bill to pass on, because the bandwidth was never
+ours.
 
-Then bake that URL into your builds so nobody who installs them has to configure anything:
+### Running your own, if you'd rather
 
-```bash
-COZY_SIGNAL=wss://cozy-signal.you.workers.dev/ws npm run dist
-```
-
-For releases built by CI, set the same value as a repository **variable** named `COZY_SIGNAL`
-(Settings → Secrets and variables → Actions → Variables). A variable rather than a secret, because
-it is a public URL and secrets are masked in logs — which makes a wrong one very hard to debug.
-
-Rate limiting is already in the code and bound in `server/wrangler.toml` — 30 attempts a minute per
-IP, keyed on `CF-Connecting-IP`, which Cloudflare overwrites so a client can't choose it. Invite
-codes are seven characters so they're quick to pass on, and that limit is part of what keeps them
-safe.
-
-Prefer your own box? Same protocol, no dependencies beyond `ws`, rate limiting already in the code:
+Entirely optional — for forks, or for anyone who would prefer their introductions didn't route
+through us. The protocol is the same either way and the app can't tell the difference.
 
 ```bash
-npm install ws && node server/serve.mjs                # ws://localhost:8787/ws
+# On any Node server, mounted into an app you already have:
+#   mountCozySignalling(httpServer, { path: '/cozy/ws', trustProxy: true })
+npm install ws && node server/serve.mjs                # standalone, ws://localhost:8787/ws
+
+# Or on Cloudflare Workers:
+npx wrangler deploy --config server/wrangler.toml
 ```
 
-Behind a reverse proxy, set `TRUST_PROXY=1` so the rate limiter reads the forwarded address. Without
-it the header is ignored on purpose — `X-Forwarded-For` is a request header anyone can send, and
-trusting it unconditionally turns the limiter off for whoever thinks to set it.
-
-Either way, individuals can override it in **Settings → Connection**.
+Then point a build at it with `COZY_SIGNAL=wss://your-server/cozy/ws npm run dist`, or a single
+install at it in **Settings → Connection**. Rate limiting is in the code in both versions — 30
+attempts a minute per address, which is what keeps a seven-character invite code safe.
 
 ---
 

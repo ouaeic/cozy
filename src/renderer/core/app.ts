@@ -4,7 +4,6 @@ import { generateCode, normaliseCode, avatarSeed as newAvatarSeed } from './invi
 import { generateName, isGeneratedName } from './names.js'
 import * as S from './state.js'
 import { watchHealth, startHealth, stopHealth } from './health.js'
-import { SIGNAL_IS_PLACEHOLDER } from './protocol.js'
 import type { FaceSize, Settings } from '../../shared/types.js'
 
 // The glue. Everything imperative lives here so the components stay declarative
@@ -179,12 +178,6 @@ export async function boot(): Promise<void> {
   S.settings.value = loaded
   mixer.setBalance(loaded.balance)
   mixer.setAutoDuck(loaded.autoDuck)
-
-  // A build nobody configured will fail at the worst possible moment — when
-  // someone is waiting for you. Say so on the home screen instead.
-  if (SIGNAL_IS_PLACEHOLDER && !loaded.signalUrl) {
-    S.say('No signalling server is set yet — see Settings → Connection, or the README.', 9000)
-  }
 
   await openPreview()
   wireNativeEvents()

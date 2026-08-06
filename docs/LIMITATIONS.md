@@ -99,33 +99,31 @@ per-application audio tap available to us. Do Not Disturb is the practical answe
 
 ---
 
-## About one connection in ten needs a relay, and Cozy doesn't ship one
+## About one connection in ten can't make a direct link
 
 Cozy connects the two computers directly. Some networks won't allow that — symmetric NAT, carrier-
 grade NAT on some mobile providers, most corporate Wi-Fi. Roughly 5–10% of pairs of real-world
 networks are affected.
 
-The fix is a TURN relay, and relaying video is the one thing about this project that would ever cost
-real money. Shipping a default relay would mean either charging you or quietly capping you.
+Carrying the video for those pairs would mean relaying it through a server, and relaying video is
+the one part of this that costs real money in bandwidth. We're not going to put that behind a
+payment, and we're not going to quietly cap everyone to cover it — so for now Cozy is honest about
+the 5–10% instead of pretending.
 
-Instead Cozy detects the failure after about twelve seconds and offers three ways out, none of which
-cost the project anything:
+Cozy notices after about twelve seconds and says so, rather than leaving you both watching a
+spinner. Two things usually fix it, both free:
 
 **Put both machines on one private network.** [Tailscale](https://tailscale.com) is free for
 personal use, takes a couple of minutes, and gives the two computers a direct encrypted path that
-looks local. Cozy's connection logic then finds that path like any other and needs no relay at all.
-For two people who watch together regularly this is the best answer: no third party in the media
-path, no bandwidth bill, nothing to configure again.
+looks local. Cozy then finds that path like any other and needs no relay at all. For two people who
+watch together regularly this is the best answer — nothing in the middle, nothing to configure
+again.
 
-**Bring your own relay.** Cloudflare Realtime gives every account 1,000 GB a month free — far more
-than you'll use — and coturn on a cheap VPS works too. Point it at port 443 over TLS (`turns:`) and
-it looks like ordinary HTTPS, which gets through nearly every restrictive network. Settings →
-Connection.
+**Try a different network.** A phone hotspot instead of office Wi-Fi is often enough; it's usually
+one end causing it, not both.
 
-**Accept that some networks just won't.** A relay is the only way to carry media across a network
-that forbids direct connections, and relaying video costs real money in bandwidth — there is no
-clever trick that avoids it. Any app that "just works" everywhere is paying that bill and charging
-you for it somewhere. Cozy would rather be free and honest about the 5–10%.
+If you happen to run a TURN relay already, Settings → Connection will use it. That field is there
+for people who have one, not a bill anyone is expected to pick up.
 
 ---
 
@@ -260,6 +258,9 @@ you'd need a media server — which is a monthly bill, which is the one thing th
 
 ## Unsigned builds
 
-macOS asks you to right-click → Open the first time; Windows shows a SmartScreen warning. An Apple
-Developer account is $99/year and a Windows OV certificate runs $200–400/year. When someone wants to
-fund that, `electron-builder.yml` is ready for it and no application code has to change.
+macOS asks you to right-click → Open the first time; Windows shows a SmartScreen warning. Both are
+the operating system telling you the app isn't signed, and both are a one-time click.
+
+Signing certificates are an annual cost to *the project*, not to you — nothing about Cozy will ever
+ask you for money. If the project takes them on later, `electron-builder.yml` is already set up for
+it and no application code changes.

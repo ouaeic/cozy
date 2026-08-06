@@ -55,15 +55,18 @@ export type ServerMessage =
  *   COZY_SIGNAL=wss://cozy-signal.you.workers.dev/ws npm run dist
  *
  * Individual users can still override it in Settings → Connection, which is
- * what self-hosters do. There is no default that works out of the box on
- * purpose: a URL that silently points at somebody else's box is worse than one
- * that tells you it isn't set.
+ * We run this. Nobody installing Cozy has to deploy anything, sign up for
+ * anything, or pay anyone — the app arrives pointing at getcozy.app and works.
+ *
+ * A fork can point somewhere else at build time:
+ *
+ *   COZY_SIGNAL=wss://your-server/cozy/ws npm run dist
+ *
+ * and an individual can override it in Settings → Connection. Neither is
+ * something a normal user should ever need to touch.
  */
 export const DEFAULT_SIGNAL_URL =
-  (import.meta.env?.VITE_COZY_SIGNAL as string | undefined) || 'wss://signal.getcozy.app/ws'
-
-/** True when nobody has pointed the app at a server yet. */
-export const SIGNAL_IS_PLACEHOLDER = DEFAULT_SIGNAL_URL.includes('signal.getcozy.app')
+  (import.meta.env?.VITE_COZY_SIGNAL as string | undefined) || 'wss://getcozy.app/cozy/ws'
 
 /** Pure STUN. No default TURN is shipped: relaying media is the one thing that
  *  would ever cost money to run, so it stays bring-your-own (Settings →

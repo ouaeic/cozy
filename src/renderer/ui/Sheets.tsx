@@ -30,10 +30,10 @@ export function Trouble(): JSX.Element {
           kind of traffic that needs.
         </p>
         <p class="faint">
-          Two ways round it, both free. Put both computers on the same private network with
-          something like Tailscale, and the direct path works again with no relay at all. Or add a
-          relay below: Cloudflare gives every account 1,000&nbsp;GB a month free, far more than
-          you’ll use, and a relay on port 443 gets through almost anything.
+          Two things usually fix it, both free. Put both computers on the same private network with
+          something like Tailscale, and the direct path works again. Or try a different network — a
+          phone hotspot instead of office Wi-Fi is often enough, and it’s usually only one end
+          causing it.
         </p>
         <div class="sheet__foot">
           <button class="btn btn--quiet" onClick={close}>
@@ -510,8 +510,8 @@ export function SettingsSheet(): JSX.Element {
           <div class="stack">
             <b>Connection</b>
             <span class="faint">
-              Only needed if Cozy told you it couldn’t find a direct path. Get free credentials from
-              Cloudflare Realtime, or run coturn yourself.
+              For people who already run a relay of their own. Nothing here is required, and nothing
+              about Cozy costs anything — if you don’t know what a TURN relay is, you don’t need one.
             </span>
             <input
               class="field"
@@ -541,7 +541,7 @@ export function SettingsSheet(): JSX.Element {
             </div>
 
             <span class="faint" style={{ marginTop: 6 }}>
-              Signalling server — leave blank unless you’re running your own.
+              Signalling server — leave blank. Cozy uses ours unless you run your own.
             </span>
             <input
               class="field"
