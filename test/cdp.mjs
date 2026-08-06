@@ -6,7 +6,7 @@ import { execFileSync } from 'node:child_process'
 import { existsSync, statSync, mkdirSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { createRequire } from 'node:module'
-import { fileURLToPath } from 'node:url'
+import { fileURLToPath, pathToFileURL } from 'node:url'
 import { dirname, join } from 'node:path'
 
 const require = createRequire(import.meta.url)
@@ -285,7 +285,12 @@ export async function loadTs(relativePath) {
     platform: 'neutral',
     logLevel: 'silent',
   })
-  return import(`${out}?t=${statSync(out).mtimeMs}`)
+  // pathToFileURL, not the bare path. On Windows an absolute path starts with
+  // a drive letter, and Node reads `C:` as a URL scheme:
+  //   ERR_UNSUPPORTED_ESM_URL_SCHEME ... Received protocol 'c:'
+  // The cache-buster keeps a rebuilt module from being served from the ESM
+  // cache within one process.
+  return import(`${pathToFileURL(out).href}?t=${statSync(out).mtimeMs}`)
 }
 
 /**

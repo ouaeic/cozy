@@ -111,3 +111,7 @@ publish:
   provider: github
   owner: ouaeic
   repo: cozy
+  # electron-builder defaults to a DRAFT, which is how a tag can build three
+  # platforms successfully and leave the Releases page looking empty. On a tag
+  # we mean it.
+  releaseType: release
