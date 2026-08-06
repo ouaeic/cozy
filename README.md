@@ -110,7 +110,8 @@ No accounts, no sign-up, no server for you to run, and nothing to pay — not a 
 trial, not a "free tier" you might exceed. Install it, and it works.
 
 Two computers can't find each other on the internet without something to introduce them; that's true
-of every peer-to-peer app. We run that introducer, at `getcozy.app`. It is about a hundred lines and
+of every peer-to-peer app. We run that introducer, at `getcozy.app`, and the app already points at
+it. It is about a hundred lines and
 does the least possible work: it passes a few sealed messages between two sockets and then gets out
 of the way. Your video and audio go **straight from one computer to the other** and never touch it —
 a whole evening costs about six small messages there. It can't read them either: the room id is a

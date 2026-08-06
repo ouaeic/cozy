@@ -131,7 +131,11 @@ saw nothing, and a partner who crashed could never get back in. Keeping a hibern
 costs nothing on Durable Objects — that is what the hibernation API is for — so the saving was
 imaginary and the bugs were not.
 
-Ships twice, same protocol: [`server/worker.ts`](../server/worker.ts) (Cloudflare Durable Objects
+Runs at `wss://getcozy.app/cozy/ws`, mounted into the website's existing Express server by
+[`server/cozy-signal.mjs`](../server/cozy-signal.mjs) — it takes over WebSocket upgrade routing and
+passes anything that isn't its own path back to the listener already there, because a
+`WebSocketServer({ server })` aborts non-matching paths with a 400 and would otherwise kill every
+connection. Also ships twice standalone, same protocol: [`server/worker.ts`](../server/worker.ts) (Cloudflare Durable Objects
 with WebSocket hibernation — an idle room costs nothing) and
 [`server/serve.mjs`](../server/serve.mjs) (~120 lines of Node, for self-hosting).
 
