@@ -1,4 +1,5 @@
 import { app } from 'electron'
+import * as store from './store.js'
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import electronUpdater from 'electron-updater'
@@ -66,6 +67,11 @@ export function start(): void {
   )
 
   const check = () => {
+    // Read the setting each time rather than at startup, so turning it off
+    // takes effect immediately instead of at the next launch. This is the only
+    // thing Cozy does without being asked, and docs/PRIVACY.md says as much —
+    // so it needs a switch, not just a disclosure.
+    if (!store.read().autoUpdate) return
     autoUpdater.checkForUpdates().catch(() => {
       /* offline, rate-limited, or no release yet */
     })

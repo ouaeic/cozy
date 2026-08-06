@@ -9,6 +9,7 @@ import { health, describe } from '../core/health.js'
 import type { FaceSize } from '../../shared/types.js'
 
 const close = () => (S.sheet.value = null)
+const isMac = window.cozy.platform === 'darwin'
 
 /** Shown when ICE has clearly given up. The honest version of "it didn't work". */
 export function Trouble(): JSX.Element {
@@ -446,6 +447,36 @@ export function SettingsSheet(): JSX.Element {
           </div>
 
           <hr style={{ border: 0, borderTop: '1px solid var(--line)', margin: '4px 0' }} />
+
+          {/* The only thing Cozy does without being asked, so it gets a switch
+              rather than just a line in the privacy doc. Shown on every
+              platform even where it does nothing — somebody wondering "does
+              this phone home?" should find the answer here, not an absence. */}
+          <div class="stack">
+            <b>Updates</b>
+            <button
+              class={`toggle ${s.autoUpdate ? 'toggle--on' : ''}`}
+              onClick={() => void app.saveSettings({ autoUpdate: !s.autoUpdate })}
+              aria-pressed={s.autoUpdate}
+            >
+              <span>
+                Check for new versions
+                <br />
+                <span class="faint">
+                  Asks GitHub for release information shortly after launch and once a day. Nothing
+                  about you is sent, and a new version installs when you next quit — never during a
+                  film. Turn it off and Cozy never contacts GitHub at all.
+                </span>
+              </span>
+              <span class="toggle__track" />
+            </button>
+            {isMac && (
+              <span class="faint">
+                On macOS this does nothing either way: an unsigned build can&rsquo;t replace itself,
+                so Cozy never checks. Update by downloading a new copy.
+              </span>
+            )}
+          </div>
 
           {health.value && (
             <div class="stack">

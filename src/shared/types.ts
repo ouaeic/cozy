@@ -45,6 +45,9 @@ export interface Settings {
   /** Avoid a headset's own microphone when using it would drop the headset out
    *  of stereo. See core/devices.ts. */
   protectPlayback: boolean
+  /** Check GitHub Releases for a new version. The only thing Cozy ever does
+   *  without being asked, so it can be switched off. */
+  autoUpdate: boolean
   /** Don't nag about Windows turning other apps down more than once. */
   duckingNoticeSeen: boolean
   /** The one thing that makes this an app for two people rather than a tool. */
@@ -64,6 +67,7 @@ export const DEFAULT_SETTINGS: Settings = {
   micDeviceId: null,
   camDeviceId: null,
   protectPlayback: true,
+  autoUpdate: true,
   duckingNoticeSeen: false,
   partner: null,
 }

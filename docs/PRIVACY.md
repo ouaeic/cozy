@@ -95,7 +95,8 @@ Cozy ever makes are:
   address is — the standard, unavoidable cost of peer-to-peer
 - GitHub Releases — checked automatically about fifteen seconds after launch and once a day while
   the app is running, for release metadata only. Packaged Windows and Linux AppImage builds do this;
-  macOS and `.deb`/`.rpm` installs never contact it at all (`src/main/updater.ts`)
+  macOS and `.deb`/`.rpm` installs never contact it at all (`src/main/updater.ts`). **Settings →
+  Updates turns it off**, and then Cozy contacts GitHub never
 - a TURN relay, only if you configured one
 
 ---
