@@ -104,7 +104,7 @@ export const inviteMessage = (code: string, from: string): string =>
     `Your code: ${code}`,
     `Open it directly: ${inviteLink(code)}`,
     ``,
-    `Don't have Cozy yet? https://github.com/getcozy/cozy/releases`,
+    `Don't have Cozy yet? https://github.com/ouaeic/cozy/releases`,
   ].join('\n')
 
 /** A stable, name-independent colour for someone's avatar. */

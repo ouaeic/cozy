@@ -4,7 +4,7 @@
   "description": "Watch things together, from far apart.",
   "license": "MIT",
   "author": "Cozy contributors",
-  "homepage": "https://github.com/getcozy/cozy#readme",
+  "homepage": "https://github.com/ouaeic/cozy#readme",
   "type": "module",
   "main": "./out/main/index.js",
   "scripts": {
@@ -53,9 +53,9 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/getcozy/cozy.git"
+    "url": "git+https://github.com/ouaeic/cozy.git"
   },
   "bugs": {
-    "url": "https://github.com/getcozy/cozy/issues"
+    "url": "https://github.com/ouaeic/cozy/issues"
   }
 }

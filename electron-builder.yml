@@ -109,5 +109,5 @@ protocols:
 
 publish:
   provider: github
-  owner: getcozy
+  owner: ouaeic
   repo: cozy

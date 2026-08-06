@@ -55,7 +55,7 @@ display is only kept awake while something is genuinely playing.
 
 ## Installing
 
-Builds for macOS, Windows and Linux are on the [releases page](https://github.com/getcozy/cozy/releases).
+Builds for macOS, Windows and Linux are on the [releases page](https://github.com/ouaeic/cozy/releases).
 
 They are **not code-signed** — certificates cost a few hundred dollars a year and this is a free
 project. So the first launch takes one extra step:
