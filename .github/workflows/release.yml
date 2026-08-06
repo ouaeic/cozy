@@ -46,7 +46,12 @@ jobs:
 
       # Unsigned by design — see README. Adding certificates later means adding
       # secrets here and keys to electron-builder.yml; no application code changes.
-      - run: npm run ${{ matrix.script }}
+      # `--publish always` on purpose. electron-builder's default policy only
+      # publishes when it decides the build looks like a release, and getting
+      # that wrong is silent: the job goes green, artifacts attach to the
+      # workflow run, and the Releases page stays empty — which is exactly what
+      # happened. On a tag we always want a release.
+      - run: npm run ${{ matrix.script }} -- --publish ${{ startsWith(github.ref, 'refs/tags/v') && 'always' || 'never' }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CSC_IDENTITY_AUTO_DISCOVERY: false
