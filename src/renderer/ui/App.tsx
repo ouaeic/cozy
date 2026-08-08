@@ -69,6 +69,15 @@ export function App(): JSX.Element {
       {S.sheet.value === 'ducking' && <Ducking />}
       {S.sheet.value === 'share-request' && <ShareRequest />}
 
+      {/* A browser will not start audio until the page has been touched, and
+          the sinks are invisible — so without this the call looks perfect and
+          is completely silent. Any click anywhere fixes it; this just says so. */}
+      {S.audioBlocked.value && (
+        <div class="notice notice--tap" role="status">
+          Tap anywhere to turn the sound on — your browser is holding it until you do.
+        </div>
+      )}
+
       {S.notice.value && <div class="notice">{S.notice.value}</div>}
     </div>
   )

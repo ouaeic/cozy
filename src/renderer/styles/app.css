@@ -1153,3 +1153,11 @@ body.faces-window {
   height: 100%;
   -webkit-app-region: no-drag; /* it isn't its own window; dragging would move the Stage */
 }
+
+/* The autoplay notice. Warmer than an error, because nothing is wrong — the
+   browser is just waiting to be touched. */
+.notice--tap {
+  border-color: var(--ember-line);
+  background: var(--ember-soft);
+  color: var(--text);
+}

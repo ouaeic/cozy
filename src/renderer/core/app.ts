@@ -176,6 +176,7 @@ export async function boot(): Promise<void> {
   }
 
   S.settings.value = loaded
+  mixer.onAudioBlocked = (blocked) => (S.audioBlocked.value = blocked)
   mixer.setBalance(loaded.balance)
   mixer.setAutoDuck(loaded.autoDuck)
 
@@ -350,6 +351,15 @@ export function openSettings(): void {
 }
 
 export async function openSharePicker(): Promise<void> {
+  // Checked BEFORE the hand-over request below, not after. Asking to take over
+  // stops the other person's film the moment they accept — so discovering
+  // afterwards that this device can't capture anything would have interrupted
+  // their evening for nothing. No phone browser implements getDisplayMedia.
+  if (!window.cozy.canShare) {
+    S.say('This device can’t share a screen — but you can still watch someone else’s.', 7000)
+    return
+  }
+
   // One screen at a time. If someone already has it, ask rather than fight —
   // two films at once helps nobody, and silently stealing it is worse.
   if (S.someoneElseSharing.value) {

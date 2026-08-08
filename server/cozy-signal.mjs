@@ -143,11 +143,14 @@ export function mountCozySignalling(httpServer, options = {}) {
       return
     }
 
-    if (inherited.length === 0) {
-      // Nobody else wants it, and an unanswered upgrade leaks the socket.
-      socket.destroy()
-      return
-    }
+// Not ours. Hand it only to the listeners we LIFTED at mount — never to
+    // ones registered since, because Node is going to call those itself and a
+    // socket handled twice throws ("handleUpgrade() was called more than once
+    // with the same socket"), which takes the whole process down.
+    //
+    // And if we lifted none, do nothing at all rather than destroy the socket:
+    // something registered after us almost certainly wants it. A dev server's
+    // hot-reload socket is exactly that case.
     for (const listener of inherited) listener.call(httpServer, req, socket, head)
   }
   httpServer.on('upgrade', onUpgrade)
@@ -166,7 +169,14 @@ export function mountCozySignalling(httpServer, options = {}) {
     // A reconnect with the same id replaces the old socket rather than showing
     // up as a second ghost peer.
     peers.get(id)?.close(1000, 'replaced')
-    if (peers.size >= maxPeers) return ws.close(1013, 'room full')
+    // Count everyone EXCEPT the socket we just replaced. close() only starts
+    // the closing handshake, so our own ghost is still in the map — and in a
+    // full room that means someone whose laptop slept is told "room full" by
+    // their own stale connection. The client treats 1013 as final and stops
+    // retrying, so they cannot get back in at all.
+    if ([...peers.keys()].filter((k) => k !== id).length >= maxPeers) {
+      return ws.close(1013, 'room full')
+    }
 
     peers.set(id, ws)
     ws.isAlive = true

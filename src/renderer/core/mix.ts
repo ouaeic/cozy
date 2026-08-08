@@ -23,7 +23,13 @@ const DUCK_TO = 0.35
 const ATTACK_COEF = 0.6
 const RELEASE_COEF = 0.1
 
+/** Anything the autoplay policy accepts as "the user is here". */
+const GESTURES = ['pointerdown', 'keydown', 'touchstart'] as const
+
 export class Mixer {
+  /** Raised when a sink refused to start, so the UI can ask for a tap. */
+  onAudioBlocked: (blocked: boolean) => void = () => {}
+
   /** One sink per person. Two is the design, but a third and fourth shouldn't
    *  silently go inaudible. */
   private voices = new Map<string, HTMLAudioElement>()
@@ -69,7 +75,7 @@ export class Mixer {
       this.voices.set(peerId, el)
     }
     el.srcObject = stream
-    void el.play().catch(() => {})
+    this.playOrArm(el)
     this.reconsiderTimer()
   }
 
@@ -82,8 +88,58 @@ export class Mixer {
   setMovie(stream: MediaStream | null): void {
     this.movie.srcObject = stream
     this.movie.volume = this.balance
-    if (stream) void this.movie.play().catch(() => {})
+    if (stream) this.playOrArm(this.movie)
     this.reconsiderTimer()
+  }
+
+  /**
+   * Play it, and if the browser refuses, remember to try again on the next
+   * thing the user touches.
+   *
+   * Electron launches with `autoplay-policy=no-user-gesture-required` (see
+   * main/index.ts), so on the desktop this never fires — the user opening the
+   * app IS the gesture. A browser tab has no such switch, and every sink here
+   * is audio-only and invisible, so a refusal is completely silent: the call
+   * connects, video plays, and nobody hears anything, with nothing on screen to
+   * explain it. Reloading mid-call and following an invite link straight into a
+   * room both land in exactly that state.
+   *
+   * Arming once is not enough. Sinks are created as people arrive and when a
+   * share starts, so a sink made after the block would never be retried — hence
+   * the pending set rather than a single listener.
+   */
+  private blocked = new Set<HTMLMediaElement>()
+  private listening = false
+
+  private playOrArm(el: HTMLMediaElement): void {
+    void el.play().catch(() => {
+      this.blocked.add(el)
+      this.onAudioBlocked(true)
+      this.listenForGesture()
+    })
+  }
+
+  private listenForGesture(): void {
+    if (this.listening) return
+    this.listening = true
+
+    const retry = () => {
+      for (const el of [...this.blocked]) {
+        void el
+          .play()
+          .then(() => this.blocked.delete(el))
+          .catch(() => {})
+      }
+      // Only stand down once everything is actually playing; one failed
+      // gesture (a scroll, say) shouldn't burn the recovery.
+      if (this.blocked.size === 0) {
+        this.listening = false
+        this.onAudioBlocked(false)
+        for (const event of GESTURES) document.removeEventListener(event, retry)
+      }
+    }
+
+    for (const event of GESTURES) document.addEventListener(event, retry, { passive: true })
   }
 
   get hasMovie(): boolean {

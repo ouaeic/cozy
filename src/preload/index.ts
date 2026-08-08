@@ -19,6 +19,10 @@ const bridge: CozyBridge = {
         (process.platform === 'linux' &&
           (process.env.XDG_SESSION_TYPE === 'wayland' || !!process.env.WAYLAND_DISPLAY)),
 
+  // Always true in the desktop app: every platform it runs on can capture a
+  // screen. The web build feature-detects instead.
+  canShare: true,
+
   getSources: () => ipcRenderer.invoke('sources:list') as Promise<CaptureSource[]>,
   armCapture: (sourceId, withAudio, muteLocal) =>
     ipcRenderer.invoke('capture:arm', sourceId, withAudio, muteLocal) as Promise<boolean>,

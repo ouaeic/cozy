@@ -85,6 +85,9 @@ export interface CozyBridge {
   /** True when the overlays must be drawn in-window rather than as their own
    *  floating OS windows — Wayland, or X11 with no compositor. */
   inlineOverlays: boolean
+  /** Whether this build can capture a screen at all. False on phones, where
+   *  no browser implements getDisplayMedia. */
+  canShare: boolean
   /** Screens and windows available to capture, with fresh thumbnails. */
   getSources(): Promise<CaptureSource[]>
   /** Arm the main-process display-media handler, then call getDisplayMedia.

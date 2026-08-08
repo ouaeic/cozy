@@ -100,15 +100,17 @@ export function ControlBar(): JSX.Element {
       </div>
 
       <div class="floatbar__group">
-        <button
-          class={`icon ${sharing ? 'icon--live' : ''}`}
-          onClick={() => (sharing ? void app.stopSharing() : void app.openSharePicker())}
-          disabled={!connected || S.askedToShare.value}
-          title={shareTitle()}
-          aria-label={shareTitle()}
-        >
-          <Icon name={sharing ? 'shareOff' : 'share'} />
-        </button>
+        {window.cozy.canShare && (
+          <button
+            class={`icon ${sharing ? 'icon--live' : ''}`}
+            onClick={() => (sharing ? void app.stopSharing() : void app.openSharePicker())}
+            disabled={!connected || S.askedToShare.value}
+            title={shareTitle()}
+            aria-label={shareTitle()}
+          >
+            <Icon name={sharing ? 'shareOff' : 'share'} />
+          </button>
+        )}
         <button
           class="icon"
           onClick={() => setPop(pop === 'sound' ? null : 'sound')}

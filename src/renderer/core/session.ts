@@ -400,7 +400,12 @@ export class Session {
 
     // If loopbackWithMute produced a silent track we'd have muted the user's
     // speakers for nothing. Re-arm without the mute and try once more.
-    if (withAudio && stream.getAudioTracks().length === 0) {
+    //
+    // Only worth doing if we actually asked for the mute. Where we didn't —
+    // Windows, and the browser build — a missing audio track was never caused
+    // by muting, so re-arming cannot fix it and the second getDisplayMedia
+    // would just put the picker in front of the user again for nothing.
+    if (withAudio && stream.getAudioTracks().length === 0 && this.filmPlaysThroughMixer) {
       stream.getTracks().forEach((t) => t.stop())
       this.filmPlaysThroughMixer = false
       await window.cozy.armCapture(sourceId, true, false)
@@ -413,6 +418,10 @@ export class Session {
           "Couldn't capture the sound from that window. The picture will still go through.",
         )
       }
+    } else if (withAudio && stream.getAudioTracks().length === 0) {
+      this.events.onNotice(
+        "Couldn't capture the sound from that window. The picture will still go through.",
+      )
     }
 
     this.screen = stream

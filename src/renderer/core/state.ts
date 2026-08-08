@@ -56,6 +56,9 @@ export const permissionKind = signal<'screen' | 'camera' | 'microphone'>('screen
 export const sources = signal<CaptureSource[]>([])
 export const notice = signal<string | null>(null)
 export const busy = signal<string | null>(null)
+/** A browser refused to start the audio until the page is touched. Never true
+ *  in the desktop app, which launches with the autoplay gate off. */
+export const audioBlocked = signal(false)
 
 /** Someone asking to take over the screen from us. */
 export const shareRequest = signal<{ peerId: string; name: string } | null>(null)

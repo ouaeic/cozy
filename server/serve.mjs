@@ -95,7 +95,12 @@ wss.on('connection', (ws, req) => {
   // A reconnect with the same id replaces the old socket instead of appearing
   // as a second ghost peer.
   peers.get(id)?.close(1000, 'replaced')
-  if (peers.size >= MAX_PEERS) return ws.close(1013, 'room full')
+  // Everyone except the socket we just replaced: close() only begins the
+  // handshake, so our own ghost is still counted, and in a full room that means
+  // a reconnect is refused by its own stale connection.
+  if ([...peers.keys()].filter((k) => k !== id).length >= MAX_PEERS) {
+    return ws.close(1013, 'room full')
+  }
 
   peers.set(id, ws)
   ws.isAlive = true

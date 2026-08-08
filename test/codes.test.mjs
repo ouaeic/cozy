@@ -175,6 +175,48 @@ check(
   deeplink.inviteFromArgv(['/path/to/Cozy', '--foo', `cozy://j/${EXAMPLE}`]) === EXAMPLE,
 )
 
+// ---- interop: the numbers a desktop app and a browser must agree on ----
+//
+// The web client at getcozy.app runs THESE modules, copied in. Two people in the
+// same room — one in the app, one in a tab — only meet because both derive the
+// same room id from the same seven characters, and seal with the same key.
+//
+// So these are golden vectors, not a re-derivation: they were captured from a
+// working build and are asserted literally. Changing the PBKDF2 rounds, the
+// salt, or either label would still "work" in isolation while silently
+// partitioning every existing client from every new one, and nothing else in
+// this suite would notice.
+//
+// If you change the derivation ON PURPOSE, these values change with it — and
+// that is a breaking protocol change that needs both sides shipped together.
+const crypto_ = await loadTs('src/renderer/core/crypto.ts')
+
+const VECTORS = [
+  ['K4RWH7N', '7a3b30becdc14d00d4be58c801af0329'],
+  ['2222222', '3b93649c7ff3679b125f5875fc7dcd48'],
+  ['YYYYYYY', '6f14214bb1b8723d140decc49afb6823'],
+  ['7YR9RP4', '764ab1e525cdce71f8147543bd9f42d1'],
+  ['F5H3NPW', '4a93153a8cbeb4c17dafcd5c89391a30'],
+]
+
+for (const [code, expected] of VECTORS) {
+  const actual = await crypto_.deriveRoomId(code)
+  check(`${code} still opens room ${expected.slice(0, 8)}…`, actual === expected, actual)
+}
+
+// A sealed payload has to survive the round trip, and a wrong code must not
+// open it — the room id being right is only half of meeting someone.
+const key = await crypto_.deriveKey('K4RWH7N')
+const sealed = await crypto_.seal(key, { hello: 'interop' })
+check(
+  'a sealed message opens with the same code',
+  JSON.stringify(await crypto_.unseal(key, sealed)) === JSON.stringify({ hello: 'interop' }),
+)
+check(
+  'and does not open with a different one',
+  (await crypto_.unseal(await crypto_.deriveKey('K4RWH7X'), sealed)) === null,
+)
+
 // ---- generated display names ----
 // Ported from the getcozy web app so the two feel like one product. Nobody
 // types a name any more, so these lists are the entire naming surface.
